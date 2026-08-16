@@ -1,0 +1,26 @@
+{
+  "name": "عبدالمجید ووڈ شاپ — بلنگ",
+  "short_name": "ووڈ شاپ بل",
+  "description": "عبدالمجید ووڈ شاپ کا بل بنانے والا ایپ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#2A1810",
+  "theme_color": "#B06E33",
+  "orientation": "portrait",
+  "lang": "ur",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
