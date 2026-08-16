@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>عبدالمجید ووڈ شاپ — بلنگ</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&family=Noto+Naskh+Arabic:wght@400..700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --walnut:#2A1810;
+    --walnut-soft:#4A3221;
+    --paper:#F7EFDD;
+    --paper-line:#D8C6A0;
+    --copper:#B06E33;
+    --copper-deep:#8A4E22;
+    --copper-light:#E8D2AE;
+    --ink:#2A1810;
+    --muted:#8A7A62;
+    --danger:#A23B2E;
+    --whatsapp:#25D366;
+    --shadow: 0 6px 18px rgba(42,24,16,0.16);
+    --shadow-sm: 0 2px 8px rgba(42,24,16,0.10);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: linear-gradient(180deg,#2A1810 0%, #211208 100%);
+    font-family:'Noto Naskh Arabic','Inter',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+
+  /* Top nav */
+  .topnav{
+    display:flex; background:transparent; padding:14px 12px 0 12px; gap:6px;
+    position:sticky; top:0; z-index:20;
+  }
+  .topnav button{
+    flex:1; border:none; background:rgba(255,255,255,0.06); color:#D9C7A8; font-family:'Noto Naskh Arabic',sans-serif;
+    font-size:13.5px; padding:11px 4px; border-radius:12px; cursor:pointer; transition:all .18s ease;
+    display:flex; align-items:center; justify-content:center; gap:5px;
+  }
+  .topnav button.active{background:var(--paper); color:var(--walnut); font-weight:700; box-shadow:var(--shadow-sm); transform:translateY(-1px);}
+  .topnav button:active{transform:scale(0.97);}
+
+  .grain{
+    height:6px; margin-top:10px;
+    background: linear-gradient(90deg, var(--copper-deep), var(--copper), var(--copper-deep));
+    opacity:0.85;
+  }
+
+  main{flex:1; padding:14px;}
+
+  /* Bill card */
+  .bill-card{
+    position:relative; overflow:hidden;
+    background:var(--paper);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px 12px 14px 12px;
+    border:1px solid var(--paper-line);
+  }
+  .watermark{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; z-index:0; overflow:hidden;
+  }
+  .watermark span{
+    font-family:'Noto Nastaliq Urdu',serif;
+    font-size:64px; color:var(--copper); opacity:0.07;
+    transform:rotate(-12deg); white-space:nowrap; font-weight:700;
+  }
+  .bill-content{position:relative; z-index:1;}
+
+  .bill-header{text-align:center; margin-bottom:6px;}
+  .shop-name{
+    font-family:'Noto Nastaliq Urdu',serif; font-size:26px; font-weight:700;
+    color:var(--walnut); line-height:1.3; margin:0;
+  }
+  .shop-sub{font-size:9.5px; color:var(--muted); letter-spacing:1.5px; margin-top:2px;}
+  .divider{
+    height:2px; margin:8px 0 9px 0; border:none;
+    background:repeating-linear-gradient(90deg, var(--copper) 0 6px, transparent 6px 10px);
+    opacity:0.55;
+  }
+  .bill-date{
+    display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--walnut-soft);
+    margin-bottom:8px; background:rgba(176,110,51,0.08); padding:6px 10px; border-radius:8px;
+  }
+  .bill-date b{color:var(--ink); font-size:13px;}
+
+  /* Item rows — single line: [del] [description] [qty] [rate] [total] */
+  .items-list{display:flex; flex-direction:column; gap:5px;}
+  .item-row{
+    position:relative;
+    border-radius:9px; padding:5px 7px;
+    background:#FFFDF8; box-shadow:var(--shadow-sm);
+    border-inline-start:3px solid var(--copper);
+    transition:opacity .2s ease;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .item-row.is-blank{opacity:0.5; border-inline-start-color:var(--paper-line);}
+  .tafseel-input{
+    flex:1 1 auto;
+    min-width:0;
+    border:none; background:transparent;
+    font-family:'Noto Nastaliq Urdu','Noto Naskh Arabic',serif; font-size:13px;
+    color:var(--ink); direction:rtl; text-align:right;
+    padding:4px 2px;
+    white-space:nowrap;
+    overflow-x:auto;
+  }
+  .tafseel-input::placeholder{color:#BBA98A;}
+  .tafseel-input:focus{outline:none;}
+  .del-btn{
+    background:none; border:none; color:var(--danger); font-size:13px; cursor:pointer; padding:2px 3px; flex-shrink:0;
+    border-radius:5px; transition:background .15s; order:5;
+  }
+  .del-btn:active{background:rgba(162,59,46,0.12);}
+  .qr-field{display:flex; align-items:center; gap:2px; font-size:9.5px; color:var(--muted); font-weight:600; flex-shrink:0; direction:ltr;}
+  .qr-field input{
+    width:36px; text-align:center; border:1px solid var(--paper-line); border-radius:6px; padding:4px 2px;
+    font-family:'Inter',sans-serif; font-size:11.5px; background:#fff; transition:border-color .15s; flex-shrink:0;
+  }
+  .qr-field input:focus{outline:none; border-color:var(--copper);}
+  .row-total{flex-shrink:0; font-weight:800; color:var(--copper-deep); font-size:12px; min-width:38px; text-align:center;}
+  .filter-btn{
+    width:100%; margin-bottom:8px; padding:9px; border:1.5px solid var(--copper);
+    background:#fff; color:var(--copper-deep); font-size:12.5px; font-weight:700;
+    border-radius:9px; cursor:pointer; font-family:'Noto Naskh Arabic',sans-serif; transition:all .15s;
+  }
+  .filter-btn:active{transform:scale(0.98);}
+  .filter-btn.active-filter{background:linear-gradient(135deg,var(--copper),var(--copper-deep)); color:#fff; border-color:var(--copper-deep);}
+
+  .add-item-btn{
+    width:100%; margin-top:10px; padding:10px; border:2px dashed var(--copper);
+    background:rgba(176,110,51,0.05); color:var(--copper-deep); font-size:13px; font-weight:700;
+    border-radius:10px; cursor:pointer; font-family:'Noto Naskh Arabic',sans-serif; transition:all .15s;
+  }
+  .add-item-btn:active{background:rgba(176,110,51,0.15); transform:scale(0.99);}
+
+  .clear-page-btn{
+    width:100%; margin-top:7px; padding:9px; border:1px solid var(--paper-line);
+    background:#fff; color:var(--walnut-soft); font-size:12px; font-weight:700;
+    border-radius:10px; cursor:pointer; font-family:'Noto Naskh Arabic',sans-serif; transition:all .15s;
+  }
+  .clear-page-btn:active{background:#F0E6D0; transform:scale(0.99);}
+
+  .grand-total-row{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:12px; padding:11px 14px; background:linear-gradient(135deg,var(--walnut),var(--walnut-soft)); border-radius:10px;
+    box-shadow:var(--shadow-sm);
+  }
+  .grand-total-row .label{color:#E8D9BE; font-size:13px; font-weight:700; font-family:'Noto Naskh Arabic',sans-serif;}
+  .grand-total-row .value{color:#fff; font-size:19px; font-weight:800; letter-spacing:0.5px;}
+
+  .empty-msg{text-align:center; color:var(--muted); font-size:13px; padding:22px 10px; line-height:1.7;}
+
+  .footer{margin-top:20px; padding-top:12px; border-top:1px solid var(--paper-line); display:flex; justify-content:space-between; align-items:center;}
+  .phone{font-size:12px; color:var(--walnut-soft); direction:ltr; display:inline-block; font-weight:600;}
+  .wa{display:flex; align-items:center; gap:5px; font-size:12px; color:var(--walnut-soft); font-weight:600;}
+  .wa svg{width:14px;height:14px;flex-shrink:0;}
+  .wa .num{direction:ltr;}
+
+  .actions{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;}
+  .actions button{
+    padding:15px 8px; border-radius:13px; border:none; font-size:14px; font-weight:700;
+    font-family:'Noto Naskh Arabic',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+    box-shadow:var(--shadow-sm); transition:transform .12s ease;
+  }
+  .actions button:active{transform:scale(0.97);}
+  .btn-save{background:var(--copper); color:#fff;}
+  .btn-print{background:var(--paper); color:var(--walnut); border:1px solid var(--paper-line) !important;}
+  .btn-pdf{background:var(--paper); color:var(--walnut); border:1px solid var(--paper-line) !important;}
+  .btn-share{background:var(--whatsapp); color:#fff;}
+
+  .msg-toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(8px); background:var(--walnut); color:#fff;
+    padding:12px 20px; border-radius:11px; font-size:13.5px; z-index:300; box-shadow:var(--shadow);
+    opacity:0; pointer-events:none; transition:opacity 0.25s, transform 0.25s;
+  }
+  .msg-toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* History */
+  .hist-list{display:flex; flex-direction:column; gap:10px;}
+  .hist-item{
+    background:var(--paper); border-radius:13px; padding:13px 15px; box-shadow:var(--shadow-sm); border:1px solid var(--paper-line);
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:transform .12s;
+  }
+  .hist-item:active{transform:scale(0.985);}
+  .hist-item .info .d{font-size:11.5px; color:var(--muted); font-weight:600;}
+  .hist-item .info .g{font-size:17px; font-weight:800; color:var(--copper-deep); margin-top:3px;}
+  .hist-item .info .c{font-size:11.5px; color:var(--walnut-soft); margin-top:3px;}
+  .hist-item .go{color:var(--copper); font-size:22px;}
+  .hist-empty{text-align:center; color:#C9B896; padding:50px 10px; font-size:14px; line-height:1.8;}
+
+  /* Settings / catalog */
+  .settings-card{background:var(--paper); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; border:1px solid var(--paper-line);}
+  .settings-title{font-family:'Noto Naskh Arabic',sans-serif; font-weight:700; color:var(--walnut); font-size:15.5px; margin:0 0 5px 0;}
+  .settings-hint{font-size:12px; color:var(--muted); margin-bottom:14px; line-height:1.7;}
+  .cat-add-row{display:flex; gap:7px; margin-bottom:16px;}
+  .cat-add-row input{
+    border:1px solid var(--paper-line); border-radius:10px; padding:11px; font-family:'Noto Nastaliq Urdu','Noto Naskh Arabic',serif;
+    font-size:14.5px; background:#fff; transition:border-color .15s;
+  }
+  .cat-add-row input:focus{outline:none; border-color:var(--copper);}
+  .cat-add-row .cname{flex:1; direction:rtl; text-align:right;}
+  .cat-add-row .crate{width:76px; direction:ltr; text-align:center; font-family:'Inter',sans-serif;}
+  .cat-add-row button{
+    background:var(--copper); color:#fff; border:none; border-radius:10px; padding:0 16px; font-size:22px; font-weight:700; cursor:pointer;
+    box-shadow:var(--shadow-sm); transition:transform .12s;
+  }
+  .cat-add-row button:active{transform:scale(0.94);}
+  .cat-list{display:flex; flex-direction:column; gap:7px;}
+  .backup-card{margin-top:14px;}
+  .backup-btn, .restore-btn{
+    width:100%; padding:12px; border-radius:10px; font-size:13.5px; font-weight:700;
+    font-family:'Noto Naskh Arabic',sans-serif; cursor:pointer; transition:all .15s; border:none;
+  }
+  .backup-btn{background:linear-gradient(135deg,var(--copper),var(--copper-deep)); color:#fff; box-shadow:var(--shadow-sm);}
+  .backup-btn:active{transform:scale(0.98);}
+  .restore-btn{background:#fff; color:var(--walnut); border:1.5px solid var(--paper-line); margin-top:8px;}
+  .restore-btn:active{background:#F0E6D0; transform:scale(0.98);}
+  .backup-note{font-size:11px; color:var(--muted); margin:10px 0 0 0; text-align:center; min-height:14px;}
+  .cat-item{
+    display:flex; align-items:center; justify-content:space-between; background:#FFFDF8;
+    border-inline-start:3px solid var(--copper); border-radius:10px; padding:10px 12px; box-shadow:var(--shadow-sm);
+  }
+  .cat-item .cn{font-family:'Noto Nastaliq Urdu','Noto Naskh Arabic',serif; font-size:14.5px; direction:rtl;}
+  .cat-item .cr{font-size:11.5px; color:var(--muted); direction:ltr; margin-top:3px;}
+  .cat-item .del-btn{font-size:16px;}
+  .cat-empty{text-align:center; color:var(--muted); font-size:13px; padding:18px 0; line-height:1.7;}
+
+  /* Generic modal (confirm + history preview) */
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(20,10,4,0.6); z-index:200; display:none;
+    align-items:flex-end; justify-content:center; backdrop-filter:blur(1px);
+  }
+  .modal-bg.show{display:flex;}
+  .modal-sheet{
+    background:var(--paper); width:100%; max-width:520px; border-radius:20px 20px 0 0; padding:18px;
+    max-height:85vh; overflow-y:auto; box-shadow:0 -8px 24px rgba(0,0,0,0.3);
+    animation:slideUp .22s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(24px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+  .modal-sheet h3{font-family:'Noto Naskh Arabic',sans-serif; margin:2px 0 12px 0; text-align:center; color:var(--walnut); font-size:16px;}
+  .modal-actions{display:flex; flex-direction:column; gap:9px; margin-top:14px;}
+  .modal-actions button{
+    padding:14px; border-radius:11px; border:none; font-size:14px; font-weight:700; cursor:pointer;
+    font-family:'Noto Naskh Arabic',sans-serif; transition:transform .12s;
+  }
+  .modal-actions button:active{transform:scale(0.98);}
+  .mb-open{background:var(--copper); color:#fff;}
+  .mb-share{background:var(--whatsapp); color:#fff;}
+  .mb-print{background:#fff; color:var(--walnut); border:1px solid var(--paper-line) !important;}
+  .mb-del{background:var(--danger); color:#fff;}
+  .mb-cancel{background:transparent; color:var(--muted); border:1px solid var(--paper-line) !important;}
+  .confirm-msg{text-align:center; font-size:14.5px; color:var(--walnut-soft); line-height:1.8; padding:4px 6px 6px;}
+  .confirm-icon{font-size:34px; text-align:center; margin-bottom:6px;}
+
+  @media print{
+    body{background:#fff !important;}
+    .topnav, .actions, .grain, .add-item-btn, .clear-page-btn, .del-btn, .filter-btn{display:none !important;}
+    .app{max-width:100%;}
+    main{padding:0;}
+    .bill-card{box-shadow:none; border:none; border-radius:0;}
+    .watermark span{opacity:0.10;}
+    .item-row{border-inline-start:none; border-bottom:1px dashed var(--paper-line); border-radius:0; background:transparent; box-shadow:none;}
+    .item-row.print-hide{display:none !important;}
+    .qr-field input{border:none; background:transparent;}
+    .tafseel-input{background:transparent;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topnav">
+    <button id="navBillBtn" class="active" onclick="showView('bill')">🧾 نیا بل</button>
+    <button id="navHistBtn" onclick="showView('history')">📚 ہسٹری</button>
+    <button id="navSetBtn" onclick="showView('settings')">⚙️ آئٹم سیٹنگ</button>
+  </div>
+  <div class="grain"></div>
+
+  <main>
+    <!-- BILL VIEW -->
+    <div id="billView">
+      <div class="bill-card" id="billCard">
+        <div class="watermark"><span>عبدالمجید ووڈ شاپ</span></div>
+        <div class="bill-content">
+          <div class="bill-header">
+            <p class="shop-name">عبدالمجید ووڈ شاپ</p>
+            <div class="shop-sub">ABDUL MAJEED WOOD SHOP</div>
+          </div>
+          <hr class="divider">
+          <div class="bill-date"><span>تاریخ / Date</span><b id="billDate"></b></div>
+
+          <button class="filter-btn" id="filterBtn" onclick="toggleHideBlanks()">✅ صرف بکی ہوئی چیزیں دکھائیں</button>
+
+          <div class="items-list" id="itemsList"></div>
+          <div class="empty-msg" id="emptyMsg" style="display:none;">کوئی آئٹم شامل نہیں<br>"آئٹم شامل کریں" یا "آئٹم سیٹنگ" میں جا کر آئٹم بنائیں</div>
+
+          <button class="add-item-btn" onclick="addAdhocItem()">＋ نیا آئٹم شامل کریں</button>
+          <button class="clear-page-btn" onclick="clearPage()">🧹 پیج صاف کریں (Clear Page)</button>
+
+          <div class="grand-total-row">
+            <span class="label">گرینڈ ٹوٹل</span>
+            <span class="value" id="grandTotal">0</span>
+          </div>
+
+          <div class="footer">
+            <span class="phone" id="phone1">03206938018</span>
+            <span class="wa">
+              <svg viewBox="0 0 32 32" fill="#25D366"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.822.737 5.573 2.137 8.002L0 32l8.213-2.104A15.9 15.9 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.28 13.28 0 01-6.78-1.857l-.487-.29-4.87 1.248 1.3-4.744-.317-.487A13.267 13.267 0 012.667 16C2.667 8.64 8.64 2.667 16 2.667S29.333 8.64 29.333 16 23.36 29.333 16 29.333zm7.293-9.92c-.4-.2-2.36-1.164-2.726-1.297-.366-.133-.632-.2-.898.2-.267.4-1.03 1.297-1.264 1.564-.233.267-.466.3-.866.1-.4-.2-1.69-.623-3.22-1.986-1.19-1.061-1.994-2.372-2.227-2.772-.233-.4-.025-.616.175-.816.18-.18.4-.466.6-.7.2-.233.267-.4.4-.666.133-.267.067-.5-.033-.7-.1-.2-.898-2.165-1.23-2.965-.324-.78-.653-.674-.898-.686l-.766-.014c-.267 0-.7.1-1.066.5-.366.4-1.4 1.368-1.4 3.335s1.433 3.868 1.633 4.135c.2.267 2.82 4.305 6.833 6.036.955.412 1.7.658 2.28.842.958.305 1.83.262 2.52.159.769-.115 2.36-.965 2.693-1.897.333-.932.333-1.73.233-1.897-.1-.166-.366-.266-.766-.466z"/></svg>
+              <span class="num" id="phone2">WhatsApp 03176128016</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-save" onclick="saveBill()">💾 بل محفوظ کریں</button>
+        <button class="btn-print" onclick="printBill()">🖨️ پرنٹ</button>
+        <button class="btn-pdf" onclick="genPdfHint()">📄 PDF بنائیں</button>
+        <button class="btn-share" onclick="shareBill()">📤 شیئر / WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- HISTORY VIEW -->
+    <div id="historyView" style="display:none;">
+      <div class="hist-list" id="histList"></div>
+    </div>
+
+    <!-- SETTINGS / CATALOG VIEW -->
+    <div id="settingsView" style="display:none;">
+      <div class="settings-card">
+        <p class="settings-title">آئٹم سیٹنگ — مستقل آئٹمز</p>
+        <p class="settings-hint">یہاں جو آئٹم شامل کریں گے وہ ہر نئے بل میں خودبخود نظر آئے گا۔ بل بناتے وقت صرف تعداد (Qty) لکھیں — باقی خالی آئٹم بل پر نہیں آئیں گے۔</p>
+        <div class="cat-add-row">
+          <input type="text" class="cname" id="catNameInput" placeholder="آئٹم کا نام / تفصیل" dir="rtl" autocomplete="off" autocorrect="off" spellcheck="false">
+          <input type="text" class="crate" id="catRateInput" placeholder="ریٹ" inputmode="decimal">
+          <button onclick="addCatalogItem()">＋</button>
+        </div>
+        <div class="cat-list" id="catList"></div>
+      </div>
+
+      <div class="settings-card backup-card">
+        <p class="settings-title">💾 ڈیٹا بیک اپ</p>
+        <p class="settings-hint">اپنا تمام ڈیٹا (آئٹمز + ہسٹری) ایک فائل میں محفوظ کریں تاکہ فون بدلنے یا ڈیٹا ضائع ہونے کی صورت میں واپس لایا جا سکے۔</p>
+        <button class="backup-btn" onclick="exportBackup()">⬇️ بیک اپ فائل بنائیں</button>
+        <button class="restore-btn" onclick="document.getElementById('restoreFileInput').click()">⬆️ بیک اپ سے واپس لائیں</button>
+        <input type="file" id="restoreFileInput" accept="application/json" style="display:none" onchange="importBackup(event)">
+        <p class="backup-note" id="backupNote"></p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="msg-toast" id="toast"></div>
+
+<!-- history bill modal -->
+<div class="modal-bg" id="histModalBg">
+  <div class="modal-sheet">
+    <h3 id="histModalTitle">بل</h3>
+    <div id="histModalPreview"></div>
+    <div class="modal-actions">
+      <button class="mb-open" id="mbOpen">📂 کھولیں / ترمیم</button>
+      <button class="mb-print" onclick="printSaved()">🖨️ پرنٹ / PDF</button>
+      <button class="mb-share" onclick="shareSaved()">📤 شیئر</button>
+      <button class="mb-del" onclick="askDeleteSaved()">🗑️ ڈیلیٹ کریں</button>
+      <button class="mb-cancel" onclick="closeModal()">بند کریں</button>
+    </div>
+  </div>
+</div>
+
+<!-- generic confirm modal -->
+<div class="modal-bg" id="confirmModalBg">
+  <div class="modal-sheet">
+    <div class="confirm-icon" id="confirmIcon">❓</div>
+    <h3 id="confirmTitle">یقین کریں</h3>
+    <p class="confirm-msg" id="confirmMsg"></p>
+    <div class="modal-actions">
+      <button class="mb-del" id="confirmYesBtn">جی ہاں</button>
+      <button class="mb-cancel" onclick="closeConfirm()">منسوخ کریں</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Persistence — uses plain localStorage so this file works fully
+   offline in any normal mobile browser, with data saved directly
+   on the device (no internet / Claude app required).
+   ============================================================ */
+let catalogData = [];
+let billsData = [];
+let saveTimer = null;
+const STORAGE_KEY = 'amws_state';
+
+function getCatalog(){ return catalogData; }
+function setCatalog(list){ catalogData = list; queueSave(); }
+function getBills(){ return billsData; }
+function setBills(list){ billsData = list; queueSave(); }
+
+function queueSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persistState, 400);
+}
+function persistState(){
+  try{
+    const data = { catalogData, billsData };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }catch(err){
+    // storage full or unavailable — fail silently, keep app usable in-memory
+  }
+}
+const DEFAULT_CATALOG = [
+  ["چپٹی 1.5'","30"],["چپٹی 2'","40"],["چپٹی 2.5'","45"],["چپٹی 3'","60"],
+  ["چپٹی 3.5'","80"],["چپٹی 4'","100"],["چپٹی 5'","125"],["چپٹی 6'","170"],
+  ["1' لراں/نیما 1.5\"×4\"","60"],["2' لراں/نیما 1.5\"×4\"","125"],["2.5' لراں/نیما 1.5\"×4\"","160"],
+  ["3' لراں/نیما 1.5\"×4\"","200"],["3.5' لراں/نیما 1.5\"×4\"","240"],["4' لراں/نیما 1.5\"×4\"","285"],
+  ["5' لراں/نیما 1.5\"×4\"","430"],["5.5' لراں/نیما 1.5\"×4\"","510"],["6' لراں/نیما 1.5\"×4\"","580"],
+  ["6.5' لراں/نیما 1.5\"×4\"","700"],
+  ["3' کراس 1.5\"×3\"","140"],["5' کراس 1.5\"×3\"","280"],["5.5' کراس 1.5\"×3\"","320"],
+  ["6' کراس 1.5\"×3\"","425"],["6.5' کراس 1.5\"×3\"","470"],
+  ["1' پاوا 2.25\"","45"],["1.5' پاوا 2.25\"","75"],["2' پاوا 2.25\"","95"],["2.5' پاوا 2.25\"","130"],
+  ["1' پاوا 3\"","80"],["1.5' پاوا 3\"","145"],["2' پاوا 3\"","215"],["3' پاوا 3\"","330"],
+  ["2' چل/پھٹی 5\"×7\"","95"],["2' چل/پھٹی 6\"×7\"","110"],["2' چل/پھٹی 7\"×7\"","150"],
+  ["2' چل/پھٹی 8\"×7\"","180"],["2' چل/پھٹی 10\"×7\"","220"],
+  ["2.5' چل/پھٹی 5\"×7\"","115"],["2.5' چل/پھٹی 6\"×7\"","160"],["2.5' چل/پھٹی 8\"×7\"","210"],
+  ["2.5' چل/پھٹی 10\"×7\"","300"],
+  ["3' چل/پھٹی 8\"×7\"","275"],["3' چل/پھٹی 10\"×7\"","350"],
+  ["3.5' چل/پھٹی 10\"×7\"","400"],
+  ["4' چل/پھٹی 8\"×7\"","410"],["4' چل/پھٹی 10\"×7\"","475"],
+  ["5' پھٹی 8\"×7\"","570"],["5' پھٹی 10\"×7\"","600"],
+  ["6' پھٹی 8\"×7\"","680"],["6' پھٹی 10\"×7\"","850"],
+  ["1.5' ریپ 2.5\"×9\"","42"],["2' ریپ 2.5\"×9\"","65"],["2.5' ریپ 2.5\"×9\"","75"],
+  ["3' ریپ 2.5\"×9\"","90"],["3.5' ریپ 2.5\"×9\"","100"],["4' ریپ 2.5\"×9\"","135"],
+  ["6' ریپ 2.5\"×9\"","250"],
+  ["2' چل/پھٹی 4\"×9\"","100"],["2' چل/پھٹی 5\"×9\"","150"],
+  ["5' تکیہ 4\"×9\"","385"],["5' تکیہ 5\"×9\"","410"],["5.5' تکیہ 4\"×9\"","450"],
+  ["5.5' تکیہ 5\"×9\"","480"],["6' تکیہ 4\"×9\"","510"],["6' تکیہ 5\"×9\"","550"],
+  ["2.5' پھڑا 5\"×3\"","450"],
+  ["3' کیکر بلی 2.25\"×2.75\"","250"],["4' کیکر بلی 2.25\"×2.75\"","370"],
+  ["5' کیکر بلی 2.25\"×2.75\"","500"],["6' کیکر بلی 2.25\"×2.75\"","600"]
+];
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const data = JSON.parse(raw);
+      catalogData = data.catalogData || [];
+      billsData = data.billsData || [];
+    } else {
+      // first run — seed with shop's standard item/rate list
+      catalogData = DEFAULT_CATALOG.map((row,i)=>({id: Date.now()+i, name: row[0], rate: row[1]}));
+      billsData = [];
+      persistState();
+    }
+  }catch(err){
+    // no saved data yet, or storage unavailable — start fresh silently
+  }
+}
+
+/* ---------- backup / restore ---------- */
+function exportBackup(){
+  try{
+    const data = { catalogData, billsData, exportedAt: new Date().toISOString(), app: 'amws_bill' };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `abdul_majeed_wood_shop_backup_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    const note = document.getElementById('backupNote');
+    if(note){ note.textContent = '✅ بیک اپ فائل ڈاؤن لوڈ ہو گئی — اسے محفوظ جگہ (WhatsApp/Drive) پر بھیج دیں'; }
+    toast('بیک اپ فائل بن گئی');
+  }catch(err){
+    toast('بیک اپ بنانے میں مسئلہ پیش آیا');
+  }
+}
+function importBackup(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data || (!data.catalogData && !data.billsData)){
+        toast('یہ فائل درست بیک اپ نہیں ہے');
+        return;
+      }
+      showConfirm('بیک اپ واپس لائیں؟ موجودہ آئٹمز اور ہسٹری بیک اپ فائل سے تبدیل ہو جائیں گے۔', ()=>{
+        catalogData = data.catalogData || [];
+        billsData = data.billsData || [];
+        persistState();
+        newBill();
+        renderCatalog();
+        renderHistory();
+        const note = document.getElementById('backupNote');
+        if(note){ note.textContent = '✅ بیک اپ واپس لایا گیا'; }
+        toast('ڈیٹا بحال ہو گیا');
+      });
+    }catch(err){
+      toast('یہ فائل درست بیک اپ نہیں ہے');
+    }
+    evt.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+let items = [];       // current bill rows: {id, tafseel, qty, rate, catalogId|null}
+let itemSeq = 0;
+let modalBillId = null;
+let currentEditingId = null;
+let currentDateLabel = null;
+let currentDateISO = null;
+
+/* ---------- utils ---------- */
+function todayStr(){
+  const d = new Date();
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+function fmt(n){
+  if(!isFinite(n)) return '0';
+  const r = Math.round(n*100)/100;
+  return r === Math.round(r) ? Math.round(r).toLocaleString('en-US') : r.toLocaleString('en-US');
+}
+function parseNum(v){
+  if(v === '' || v === null || v === undefined) return 0;
+  const n = parseFloat(v);
+  return isFinite(n) ? n : 0;
+}
+function escapeHtml(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(()=> t.classList.remove('show'), 2200);
+}
+function autoGrow(el){
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight) + 'px';
+}
+
+/* ---------- generic confirm modal (replaces unreliable window.confirm) ---------- */
+let _confirmCallback = null;
+function showConfirm(msg, onYes, icon){
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmIcon').textContent = icon || '❓';
+  _confirmCallback = onYes;
+  document.getElementById('confirmModalBg').classList.add('show');
+}
+function closeConfirm(){
+  document.getElementById('confirmModalBg').classList.remove('show');
+  _confirmCallback = null;
+}
+document.getElementById('confirmYesBtn').onclick = function(){
+  const cb = _confirmCallback;
+  closeConfirm();
+  if(cb) cb();
+};
+
+/* ---------- catalog (item settings) ---------- */
+function addCatalogItem(){
+  const nameInp = document.getElementById('catNameInput');
+  const rateInp = document.getElementById('catRateInput');
+  const name = nameInp.value.trim();
+  if(!name){ toast('آئٹم کا نام لکھیں'); return; }
+  const cat = getCatalog();
+  const id = Date.now();
+  cat.push({id, name, rate: rateInp.value.trim()});
+  setCatalog(cat);
+  nameInp.value = '';
+  rateInp.value = '';
+  nameInp.focus();
+  renderCatalog();
+  toast('آئٹم سیٹنگ میں شامل ہو گیا');
+}
+function deleteCatalogItem(id){
+  showConfirm('یہ آئٹم مستقل فہرست سے حذف کریں؟', ()=>{
+    setCatalog(getCatalog().filter(c=>c.id!==id));
+    renderCatalog();
+    toast('آئٹم حذف ہو گیا');
+  }, '🗑️');
+}
+function renderCatalog(){
+  const list = document.getElementById('catList');
+  const cat = getCatalog();
+  if(cat.length===0){
+    list.innerHTML = '<div class="cat-empty">ابھی کوئی مستقل آئٹم شامل نہیں<br>اوپر نام لکھ کر ＋ دبائیں</div>';
+    return;
+  }
+  list.innerHTML = '';
+  cat.forEach(c=>{
+    const div = document.createElement('div');
+    div.className = 'cat-item';
+    div.innerHTML = `
+      <div>
+        <div class="cn">${escapeHtml(c.name)}</div>
+        <div class="cr">${c.rate ? 'ریٹ: '+escapeHtml(c.rate) : ''}</div>
+      </div>
+      <button class="del-btn" onclick="deleteCatalogItem(${c.id})">🗑</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+/* ---------- bill items ---------- */
+function buildRowsFromCatalog(){
+  const cat = getCatalog();
+  items = cat.map(c => ({id: ++itemSeq, tafseel: c.name, qty:'', rate: c.rate || '', catalogId: c.id}));
+}
+
+function addAdhocItem(){
+  itemSeq++;
+  items.push({id: itemSeq, tafseel:'', qty:'', rate:'', catalogId:null});
+  renderItems();
+  setTimeout(()=>{
+    const el = document.querySelector(`.row-${itemSeq} .tafseel-input`);
+    if(el) el.focus();
+  }, 30);
+}
+
+function removeItem(id){
+  items = items.filter(i => i.id !== id);
+  renderItems();
+}
+
+function updateItem(id, field, value){
+  const it = items.find(i => i.id === id);
+  if(it) it[field] = value;
+  renderTotals();
+}
+
+let hideBlanks = false;
+
+function renderItems(){
+  const list = document.getElementById('itemsList');
+  list.innerHTML = '';
+  const visibleItems = hideBlanks ? items.filter(it => parseNum(it.qty) > 0) : items;
+  document.getElementById('emptyMsg').style.display = items.length ? 'none' : 'block';
+  if(hideBlanks && visibleItems.length === 0){
+    list.innerHTML = '<div class="empty-msg" style="display:block;">کوئی چیز فروخت نہیں ہوئی — تعداد بھریں یا فلٹر ہٹائیں</div>';
+  }
+  visibleItems.forEach(it=>{
+    const isBlank = parseNum(it.qty) <= 0;
+    const row = document.createElement('div');
+    row.className = 'item-row row-' + it.id + (isBlank ? ' is-blank' : '');
+    row.innerHTML = `
+      <button class="del-btn" onclick="removeItem(${it.id})" title="حذف کریں">🗑</button>
+      <input class="tafseel-input" type="text" dir="rtl" placeholder="آئٹم کی تفصیل..." autocomplete="off" autocorrect="off" spellcheck="false"
+        value="${escapeHtml(it.tafseel)}"
+        oninput="updateItem(${it.id},'tafseel',this.value)">
+      <span class="qr-field">ریٹ<input type="text" inputmode="decimal" value="${escapeHtml(it.rate)}"
+        oninput="updateItem(${it.id},'rate',this.value)"></span>
+      <span class="qr-field">تعداد<input type="text" inputmode="decimal" value="${escapeHtml(it.qty)}"
+        oninput="updateItem(${it.id},'qty',this.value)"></span>
+      <span class="row-total">${fmt(parseNum(it.qty)*parseNum(it.rate))}</span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function toggleHideBlanks(){
+  hideBlanks = !hideBlanks;
+  const btn = document.getElementById('filterBtn');
+  if(btn){
+    btn.textContent = hideBlanks ? '👁️ سب آئٹم دکھائیں' : '✅ صرف بکی ہوئی چیزیں دکھائیں';
+    btn.classList.toggle('active-filter', hideBlanks);
+  }
+  renderItems();
+}
+
+function renderTotals(){
+  items.forEach(it=>{
+    const row = document.querySelector('.row-' + it.id);
+    if(row){
+      row.querySelector('.row-total').textContent = fmt(parseNum(it.qty)*parseNum(it.rate));
+      row.classList.toggle('is-blank', parseNum(it.qty) <= 0);
+    }
+  });
+  const grand = items.reduce((s,it)=> parseNum(it.qty) > 0 ? s + parseNum(it.qty)*parseNum(it.rate) : s, 0);
+  document.getElementById('grandTotal').textContent = fmt(grand);
+}
+
+/* items that actually appear on the final bill (qty entered) */
+function activeItems(){
+  return items.filter(it => parseNum(it.qty) > 0);
+}
+
+function resetFilterBtn(){
+  hideBlanks = false;
+  const btn = document.getElementById('filterBtn');
+  if(btn){ btn.textContent = '✅ صرف بکی ہوئی چیزیں دکھائیں'; btn.classList.remove('active-filter'); }
+}
+
+function clearPage(){
+  showConfirm('پیج صاف کریں؟ تمام تعداد و ریٹ خالی ہو جائیں گے۔ آئٹم سیٹنگ محفوظ رہے گی۔', ()=>{
+    buildRowsFromCatalog();
+    currentEditingId = null;
+    currentDateLabel = todayStr();
+    currentDateISO = new Date().toISOString();
+    document.getElementById('billDate').textContent = currentDateLabel;
+    resetFilterBtn();
+    renderItems();
+    renderTotals();
+    toast('پیج صاف ہو گیا ✓');
+  }, '🧹');
+}
+
+function newBill(){
+  buildRowsFromCatalog();
+  currentEditingId = null;
+  currentDateLabel = todayStr();
+  currentDateISO = new Date().toISOString();
+  document.getElementById('billDate').textContent = currentDateLabel;
+  resetFilterBtn();
+  renderItems();
+  renderTotals();
+}
+
+function loadBillIntoEditor(bill){
+  items = bill.items.map(it => ({id: ++itemSeq, tafseel: it.tafseel, qty: it.qty, rate: it.rate, catalogId:null}));
+  currentEditingId = bill.id;
+  currentDateLabel = bill.date;
+  currentDateISO = bill.dateISO;
+  document.getElementById('billDate').textContent = bill.date;
+  renderItems();
+  renderTotals();
+}
+
+/* ---------- views ---------- */
+function showView(v){
+  document.getElementById('billView').style.display = v==='bill' ? '' : 'none';
+  document.getElementById('historyView').style.display = v==='history' ? '' : 'none';
+  document.getElementById('settingsView').style.display = v==='settings' ? '' : 'none';
+  document.getElementById('navBillBtn').classList.toggle('active', v==='bill');
+  document.getElementById('navHistBtn').classList.toggle('active', v==='history');
+  document.getElementById('navSetBtn').classList.toggle('active', v==='settings');
+  if(v==='history') renderHistory();
+  if(v==='settings') renderCatalog();
+}
+
+/* ---------- save / history ---------- */
+function saveBill(){
+  const validItems = activeItems();
+  if(validItems.length === 0){
+    toast('کم از کم ایک آئٹم کی تعداد لکھیں');
+    return;
+  }
+  currentDateLabel = currentDateLabel || todayStr();
+  currentDateISO = currentDateISO || new Date().toISOString();
+  currentEditingId = currentEditingId || Date.now();
+  const billObj = {
+    id: currentEditingId,
+    date: currentDateLabel,
+    dateISO: currentDateISO,
+    items: validItems.map(it=>({tafseel:it.tafseel, qty:it.qty, rate:it.rate})),
+    grand: validItems.reduce((s,it)=> s + parseNum(it.qty)*parseNum(it.rate), 0)
+  };
+  let bills = getBills();
+  const idx = bills.findIndex(b => b.id === billObj.id);
+  if(idx >= 0) bills[idx] = billObj; else bills.unshift(billObj);
+  setBills(bills);
+  toast('بل محفوظ ہو گیا ✓');
+  renderHistory();
+}
+
+function renderHistory(){
+  const list = document.getElementById('histList');
+  const bills = getBills();
+  if(bills.length === 0){
+    list.innerHTML = '<div class="hist-empty">ابھی کوئی بل محفوظ نہیں ہوا</div>';
+    return;
+  }
+  list.innerHTML = '';
+  bills.forEach(b=>{
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    div.onclick = ()=> openHistModal(b.id);
+    div.innerHTML = `
+      <div class="info">
+        <div class="d">${b.date}</div>
+        <div class="g">${fmt(b.grand)}</div>
+        <div class="c">${b.items.length} آئٹمز</div>
+      </div>
+      <div class="go">‹</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function openHistModal(id){
+  modalBillId = id;
+  const bill = getBills().find(b=>b.id===id);
+  if(!bill) return;
+  document.getElementById('histModalTitle').textContent = 'بل — ' + bill.date;
+  let rows = bill.items.map(it => `
+    <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--paper-line);">
+      <span style="direction:rtl;">${escapeHtml(it.tafseel)||'—'}</span>
+      <span style="direction:ltr;color:var(--muted);">${it.qty||0} × ${it.rate||0} = ${fmt(parseNum(it.qty)*parseNum(it.rate))}</span>
+    </div>`).join('');
+  document.getElementById('histModalPreview').innerHTML = `
+    <div style="max-height:220px;overflow-y:auto;">${rows}</div>
+    <div style="margin-top:12px;text-align:center;font-weight:800;color:var(--copper-deep);font-size:17px;">
+      گرینڈ ٹوٹل: ${fmt(bill.grand)}
+    </div>`;
+  document.getElementById('histModalBg').classList.add('show');
+}
+function closeModal(){ document.getElementById('histModalBg').classList.remove('show'); }
+document.getElementById('mbOpen').onclick = ()=>{
+  const bill = getBills().find(b=>b.id===modalBillId);
+  if(bill){ loadBillIntoEditor(bill); closeModal(); showView('bill'); }
+};
+function askDeleteSaved(){
+  showConfirm('کیا آپ واقعی اس بل کو ڈیلیٹ کرنا چاہتے ہیں؟', ()=>{
+    setBills(getBills().filter(b=>b.id !== modalBillId));
+    closeModal();
+    renderHistory();
+    toast('بل حذف ہو گیا');
+  }, '🗑️');
+}
+function printSaved(){
+  const bill = getBills().find(b=>b.id===modalBillId);
+  if(bill){ loadBillIntoEditor(bill); closeModal(); showView('bill'); setTimeout(()=> printBill(), 200); }
+}
+function shareSaved(){
+  const bill = getBills().find(b=>b.id===modalBillId);
+  if(bill) shareBillObj(bill);
+}
+
+/* ---------- print / pdf / share ---------- */
+function printBill(){
+  document.querySelectorAll('.item-row').forEach(row=>{
+    const totalTxt = row.querySelector('.row-total').textContent.trim();
+    if(totalTxt === '0' && row.classList.contains('is-blank')) row.classList.add('print-hide');
+  });
+  window.print();
+  setTimeout(()=>{
+    document.querySelectorAll('.item-row.print-hide').forEach(r=>r.classList.remove('print-hide'));
+  }, 500);
+}
+function genPdfHint(){
+  toast('پرنٹ ڈائیلاگ میں "Save as PDF" منتخب کریں');
+  setTimeout(()=> printBill(), 600);
+}
+function billToObj(){
+  const active = activeItems();
+  return {
+    id: currentEditingId || Date.now(),
+    date: currentDateLabel || todayStr(),
+    dateISO: currentDateISO || new Date().toISOString(),
+    items: active.map(it=>({tafseel:it.tafseel, qty:it.qty, rate:it.rate})),
+    grand: active.reduce((s,it)=> s + parseNum(it.qty)*parseNum(it.rate), 0)
+  };
+}
+function billToText(bill){
+  let lines = [];
+  lines.push('عبدالمجید ووڈ شاپ');
+  lines.push('Date: ' + bill.date);
+  lines.push('----------------------');
+  bill.items.forEach(it=>{
+    const t = parseNum(it.qty)*parseNum(it.rate);
+    lines.push(`${it.tafseel || '-'} | ${it.qty||0} x ${it.rate||0} = ${fmt(t)}`);
+  });
+  lines.push('----------------------');
+  lines.push('Grand Total: ' + fmt(bill.grand));
+  lines.push('');
+  lines.push('03206938018');
+  lines.push('WhatsApp: 03176128016');
+  return lines.join('\n');
+}
+async function shareBillObj(bill){
+  const text = billToText(bill);
+  if(navigator.share){
+    try{ await navigator.share({title:'عبدالمجید ووڈ شاپ - بل', text}); return; }catch(e){}
+  }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+function shareBill(){
+  if(activeItems().length === 0){ toast('شیئر کرنے کے لیے پہلے تعداد لکھیں'); return; }
+  shareBillObj(billToObj());
+}
+
+/* ---------- init ---------- */
+(async function init(){
+  await loadState();
+  newBill();
+  renderCatalog();
+})();
+</script>
+</body>
+</html>
